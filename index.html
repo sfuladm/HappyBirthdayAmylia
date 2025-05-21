@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Adventure</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #ffb8b8;
+            --accent: #ff8e8e;
+            --dark: #4a4a4a;
+            --light: #fff9f9;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            width: 50%;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+            padding-right: 3rem;
+        }
+        
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            text-align: left;
+            padding-left: 3rem;
+        }
+        
+        .timeline-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .timeline-content::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: 5px -5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content::after {
+            right: -10px;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content::after {
+            left: -10px;
+        }
+        
+        .time {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .event {
+            font-size: 1rem;
+        }
+        
+        .emoji {
+            font-size: 1.2rem;
+            margin-left: 0.3rem;
+        }
+        
+        .day-separator {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+        
+        .day-separator span {
+            background: white;
+            padding: 0.5rem 2rem;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-weight: bold;
+            color: var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .day-separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--secondary);
+            z-index: 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .sound-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .sound-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .sound-toggle i {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                left: 0;
+                padding-left: 70px;
+                padding-right: 0;
+                text-align: left;
+            }
+            
+            .timeline-item:nth-child(even) {
+                left: 0;
+            }
+            
+            .timeline-content::after {
+                left: -10px !important;
+                right: auto !important;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Birthday Adventure</h1>
+            <p class="subtitle">Two Days of Special Celebrations ❤️</p>
+        </header>
+        
+        <div class="timeline">
+            <div class="day-separator">
+                <span>Day 1</span>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">11:00 AM</div>
+                    <div class="event">Pick up my baby boo <span class="emoji">💖</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">11:30 AM</div>
+                    <div class="event">Breakfast at Sentul <span class="emoji">🥐☕</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">12:00 PM</div>
+                    <div class="event">Off to The Curve for some fun <span class="emoji">🎉</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">12:30 PM</div>
+                    <div class="event">Spy Room sneak peek <span class="emoji">🕵️‍♀️🕵️‍♂️</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">1:00 PM</div>
+                    <div class="event">Lunch time! <span class="emoji">🍜</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">3:00 PM</div>
+                    <div class="event">Check-in at the hotel <span class="emoji">🏨</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">5:00 PM</div>
+                    <div class="event">Get ready and head out for the full Spy Room experience <span class="emoji">🔍✨</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">8:00 PM</div>
+                    <div class="event">Dinner date <span class="emoji">😋</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">10:00 PM</div>
+                    <div class="event">Back to our cozy hotel room <span class="emoji">🛏️💤</span></div>
+                </div>
+            </div>
+            
+            <div class="day-separator">
+                <span>Day 2</span>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">8:00 AM</div>
+                    <div class="event">Breakfast time <span class="emoji">☀️🍳</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">9:00 AM</div>
+                    <div class="event">Off we go to Sunway Lagoon! <span class="emoji">🚗🎢</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">10:00 AM</div>
+                    <div class="event">Arrive at Sunway Lagoon – let the water fun begin! <span class="emoji">🏄‍♀️💦</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">8:00 PM</div>
+                    <div class="event">Dinner and unwind <span class="emoji">🍔🍹</span></div>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="time">10:00 PM</div>
+                    <div class="event">Head back home, tired but happy <span class="emoji">❤️🏠</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sound-toggle" id="soundToggle">
+        <i class="fas fa-volume-up"></i>
+    </div>
+    
+    <audio id="bgMusic" loop>
+        <source src="happy-birthday.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate timeline items as user scrolls
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            timelineItems.forEach(item => {
+                observer.observe(item);
+            });
+            
+            // Sound toggle functionality
+            const soundToggle = document.getElementById('soundToggle');
+            const bgMusic = document.getElementById('bgMusic');
+            let isPlaying = false;
+            
+            // For demo purposes, we're using a placeholder music
+            // In a real implementation, you would use:
+            // bgMusic.src = "happy-birthday-song.mp3";
+            bgMusic.volume = 0.3;
+            
+            // Try to autoplay (may be blocked by browser)
+            const playPromise = bgMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    isPlaying = true;
+                })
+                .catch(error => {
+                    isPlaying = false;
+                    soundToggle.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                });
+            }
+            
+            soundToggle.addEventListener('click', function() {
+                if (isPlaying) {
+                    bgMusic.pause();
+                    soundToggle.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    bgMusic.play();
+                    soundToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+                isPlaying = !isPlaying;
+            });
+        });
+    </script>
+</body>
+</html>
